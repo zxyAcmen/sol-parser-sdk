@@ -32,6 +32,7 @@ perf-stats = []   # 启用性能统计
 ultra-perf = []   # 极限性能模式（启用所有 unsafe 优化）
 
 [dependencies]
+custom-parser = { workspace = true }
 # Pin to 3.3.x: solana-keypair 3.1.2 + solana-signature 3.4.x can fail to compile (DecodeError / from_source)
 # when publishing without local patches; 3.3.x matches solana-keypair's own dependency range.
 solana-signature = { version = "3.3.0", default-features = false, features = ["std", "alloc", "verify"] }

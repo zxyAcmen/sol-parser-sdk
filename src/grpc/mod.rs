@@ -22,7 +22,7 @@ pub mod transaction_meta;
 pub mod types;
 
 // 重新导出主要API
-pub use client::YellowstoneGrpc;
+pub use client::{TxEnvelope, YellowstoneGrpc};
 pub use geyser_connect::{connect_yellowstone_geyser, GeyserConnectConfig};
 pub use subscribe_builder::{
     build_subscribe_request, build_subscribe_request_with_commitment,

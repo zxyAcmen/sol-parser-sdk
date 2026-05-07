@@ -29,6 +29,9 @@ use tokio::time::{Duration, Instant};
 use yellowstone_grpc_client::{GeyserGrpcClient, ClientTlsConfig};
 use yellowstone_grpc_proto::prelude::*;
 
+mod tx_envelope;
+pub use tx_envelope::TxEnvelope;
+
 static PROGRAM_DATA_FINDER: Lazy<memmem::Finder> =
     Lazy::new(|| memmem::Finder::new(b"Program data: "));
 

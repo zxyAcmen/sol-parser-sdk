@@ -10,6 +10,7 @@ use super::types::*;
 pub enum DexEvent {
     // PumpFun 事件
     PumpFunCreate(PumpFunCreateTokenEvent),     // - 已对接
+    PumpFunCreateAndTrades(PumpFunCreateAndTradesEvent), // - Create + 同 tx 交易
     PumpFunCreateV2(PumpFunCreateV2TokenEvent), // - 已对接 (CreateV2 / Mayhem)
     PumpFunTrade(PumpFunTradeEvent),            // - 已对接 (统一交易事件，包含所有交易类型)
     PumpFunBuy(PumpFunTradeEvent),              // - 已对接 (仅买入事件，用于过滤)
@@ -124,6 +125,7 @@ impl DexEvent {
         match self {
             // PumpFun 事件
             DexEvent::PumpFunCreate(e) => &e.metadata,
+            DexEvent::PumpFunCreateAndTrades(e) => &e.metadata,
             DexEvent::PumpFunCreateV2(e) => &e.metadata,
             DexEvent::PumpFunTrade(e) => &e.metadata,
             DexEvent::PumpFunBuy(e) => &e.metadata,
@@ -227,6 +229,7 @@ impl DexEvent {
     pub fn metadata_mut(&mut self) -> Option<&mut EventMetadata> {
         match self {
             DexEvent::PumpFunCreate(e) => Some(&mut e.metadata),
+            DexEvent::PumpFunCreateAndTrades(e) => Some(&mut e.metadata),
             DexEvent::PumpFunCreateV2(e) => Some(&mut e.metadata),
             DexEvent::PumpFunTrade(e) => Some(&mut e.metadata),
             DexEvent::PumpFunBuy(e) => Some(&mut e.metadata),

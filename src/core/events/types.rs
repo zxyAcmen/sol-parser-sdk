@@ -357,6 +357,13 @@ pub struct PumpFunCreateTokenEvent {
     pub is_cashback_enabled: bool,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct PumpFunCreateAndTradesEvent {
+    pub metadata: EventMetadata,
+    pub create: PumpFunCreateTokenEvent,
+    pub trades: Vec<PumpFunTradeEvent>,
+}
+
 /// PumpFun Create V2 Token Event (SPL-22 / Mayhem Mode)
 /// 与 solana-streamer 对齐；指令解析时从 accounts 0..15 填充。
 #[derive(Debug, Clone, Serialize, Deserialize, Default, BorshDeserialize)]

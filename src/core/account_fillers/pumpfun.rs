@@ -1,10 +1,22 @@
 //! PumpFun 账户填充模块
 
+use crate::accounts::program_ids::{SPL_TOKEN_2022_PROGRAM_ID, SPL_TOKEN_PROGRAM_ID};
 use crate::core::events::*;
 use solana_sdk::pubkey::Pubkey;
 
 /// 账户获取辅助函数类型
 pub type AccountGetter<'a> = dyn Fn(usize) -> Pubkey + 'a;
+
+#[inline]
+fn is_spl_token_program(pk: Pubkey) -> bool {
+    pk == SPL_TOKEN_PROGRAM_ID || pk == SPL_TOKEN_2022_PROGRAM_ID
+}
+
+#[inline]
+fn is_v2_trade_accounts(e: &PumpFunTradeEvent, get: &AccountGetter<'_>) -> bool {
+    matches!(e.ix_name.as_str(), "buy_v2" | "sell_v2" | "buy_exact_quote_in_v2")
+        || (is_spl_token_program(get(3)) && get(4) == SPL_TOKEN_PROGRAM_ID)
+}
 
 /// 填充 PumpFun Trade 事件账户
 ///
@@ -16,6 +28,11 @@ pub type AccountGetter<'a> = dyn Fn(usize) -> Pubkey + 'a;
 /// 16 (可选) remaining_account / fee 相关，部分交易存在。
 /// Sell 共 14 个固定账户，部分版本也有 17 个账户时 16 同 buy。
 pub fn fill_trade_accounts(e: &mut PumpFunTradeEvent, get: &AccountGetter<'_>) {
+    if is_v2_trade_accounts(e, get) {
+        fill_trade_v2_accounts(e, get);
+        return;
+    }
+
     // 指令账户 #1 = fee_recipient（IDL）；仅日志路径时常为 default，补全后可与 mayhem/普通池一致，供 sol-trade-sdk 校验。
     if e.fee_recipient == Pubkey::default() {
         let fr = get(1);
@@ -42,6 +59,46 @@ pub fn fill_trade_accounts(e: &mut PumpFunTradeEvent, get: &AccountGetter<'_>) {
     let a17 = get(16);
     if a17 != Pubkey::default() {
         e.account = Some(a17);
+    }
+}
+
+/// 填充 PumpFun v2 Trade 事件账户。
+///
+/// buy_v2 / sell_v2 / buy_exact_quote_in_v2 统一账户接口：
+/// 1 base_mint, 3 base_token_program, 6 fee_recipient, 10 bonding_curve,
+/// 11 associated_base_bonding_curve, 13 user, 16 creator_vault。
+pub fn fill_trade_v2_accounts(e: &mut PumpFunTradeEvent, get: &AccountGetter<'_>) {
+    let mint = get(1);
+    if mint != Pubkey::default() {
+        e.mint = mint;
+    }
+    let fee_recipient = get(6);
+    if fee_recipient != Pubkey::default() {
+        e.fee_recipient = fee_recipient;
+    }
+    let user = get(13);
+    if user != Pubkey::default() {
+        e.user = user;
+    }
+    let bonding_curve = get(10);
+    if bonding_curve != Pubkey::default() {
+        e.bonding_curve = bonding_curve;
+    }
+    let associated_bonding_curve = get(11);
+    if associated_bonding_curve != Pubkey::default() {
+        e.associated_bonding_curve = associated_bonding_curve;
+    }
+    let token_program = get(3);
+    if token_program != Pubkey::default() {
+        e.token_program = token_program;
+    }
+    let creator_vault = get(16);
+    if creator_vault != Pubkey::default() {
+        e.creator_vault = creator_vault;
+    }
+    let associated_creator_vault = get(17);
+    if associated_creator_vault != Pubkey::default() {
+        e.account = Some(associated_creator_vault);
     }
 }
 
@@ -176,5 +233,50 @@ mod tests {
         let mut e = PumpFunTradeEvent { fee_recipient: Pubkey::default(), ..Default::default() };
         fill_trade_accounts(&mut e, &get);
         assert_eq!(e.fee_recipient, fee);
+    }
+
+    #[test]
+    fn fill_trade_accounts_detects_v2_layout_even_without_v2_ix_name() {
+        let wrong_legacy_vault = Pubkey::new_from_array([9u8; 32]);
+        let correct_v2_vault = Pubkey::new_from_array([16u8; 32]);
+        let get = |i: usize| -> Pubkey {
+            match i {
+                3 => SPL_TOKEN_2022_PROGRAM_ID,
+                4 => SPL_TOKEN_PROGRAM_ID,
+                9 => wrong_legacy_vault,
+                16 => correct_v2_vault,
+                _ => Pubkey::default(),
+            }
+        };
+
+        let mut e =
+            PumpFunTradeEvent { ix_name: "buy".to_string(), is_buy: true, ..Default::default() };
+        fill_trade_accounts(&mut e, &get);
+
+        assert_eq!(e.creator_vault, correct_v2_vault);
+        assert_eq!(e.token_program, SPL_TOKEN_2022_PROGRAM_ID);
+    }
+
+    #[test]
+    fn fill_trade_v2_accounts_overwrites_stale_non_default_vault() {
+        let stale_vault = Pubkey::new_from_array([9u8; 32]);
+        let correct_v2_vault = Pubkey::new_from_array([16u8; 32]);
+        let get = |i: usize| -> Pubkey {
+            match i {
+                3 => SPL_TOKEN_2022_PROGRAM_ID,
+                4 => SPL_TOKEN_PROGRAM_ID,
+                16 => correct_v2_vault,
+                _ => Pubkey::default(),
+            }
+        };
+
+        let mut e = PumpFunTradeEvent {
+            ix_name: "buy_v2".to_string(),
+            creator_vault: stale_vault,
+            ..Default::default()
+        };
+        fill_trade_accounts(&mut e, &get);
+
+        assert_eq!(e.creator_vault, correct_v2_vault);
     }
 }

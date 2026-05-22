@@ -192,7 +192,13 @@ fn next_pumpfun_dedup_key(
 ) -> Option<LogInstrDedupKey> {
     use DexEvent::*;
     match ev {
-        PumpFunTrade(t) | PumpFunBuy(t) | PumpFunSell(t) | PumpFunBuyExactSolIn(t) => {
+        PumpFunTrade(t)
+        | PumpFunBuy(t)
+        | PumpFunSell(t)
+        | PumpFunBuyExactSolIn(t)
+        | PumpFunBuyV2(t)
+        | PumpFunSellV2(t)
+        | PumpFunBuyExactQuoteInV2(t) => {
             let lane = pumpfun_ix_lane(t.ix_name.as_str());
             let base = (t.mint, t.user, t.is_buy, lane);
             let entry = lane_count.entry(base).or_insert(0);

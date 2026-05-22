@@ -81,7 +81,10 @@ pub fn fill_accounts_with_owned_keys(
         DexEvent::PumpFunTrade(e)
         | DexEvent::PumpFunBuy(e)
         | DexEvent::PumpFunSell(e)
-        | DexEvent::PumpFunBuyExactSolIn(e) => {
+        | DexEvent::PumpFunBuyExactSolIn(e)
+        | DexEvent::PumpFunBuyV2(e)
+        | DexEvent::PumpFunSellV2(e)
+        | DexEvent::PumpFunBuyExactQuoteInV2(e) => {
             fill_event_accounts!(
                 e,
                 meta,

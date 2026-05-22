@@ -18,6 +18,10 @@ fn pumpfun_buy_like_mint_fee(e: &DexEvent) -> Option<(Pubkey, Pubkey)> {
         DexEvent::PumpFunBuyExactSolIn(t) if t.mint != Pubkey::default() => {
             Some((t.mint, t.fee_recipient))
         }
+        DexEvent::PumpFunBuyV2(t) if t.mint != Pubkey::default() => Some((t.mint, t.fee_recipient)),
+        DexEvent::PumpFunBuyExactQuoteInV2(t) if t.mint != Pubkey::default() => {
+            Some((t.mint, t.fee_recipient))
+        }
         _ => None,
     }
 }
@@ -69,7 +73,10 @@ fn trade_event_mut(e: &mut DexEvent) -> Option<&mut PumpFunTradeEvent> {
         DexEvent::PumpFunTrade(t)
         | DexEvent::PumpFunBuy(t)
         | DexEvent::PumpFunSell(t)
-        | DexEvent::PumpFunBuyExactSolIn(t) => Some(t),
+        | DexEvent::PumpFunBuyExactSolIn(t)
+        | DexEvent::PumpFunBuyV2(t)
+        | DexEvent::PumpFunSellV2(t)
+        | DexEvent::PumpFunBuyExactQuoteInV2(t) => Some(t),
         _ => None,
     }
 }

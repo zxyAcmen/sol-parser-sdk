@@ -16,6 +16,9 @@ pub enum DexEvent {
     PumpFunBuy(PumpFunTradeEvent),          // - 已对接 (仅买入事件，用于过滤)
     PumpFunSell(PumpFunTradeEvent),         // - 已对接 (仅卖出事件，用于过滤)
     PumpFunBuyExactSolIn(PumpFunTradeEvent), // - 已对接 (精确SOL买入事件，用于过滤)
+    PumpFunBuyV2(PumpFunTradeEvent),        // - 新统一买入接口
+    PumpFunSellV2(PumpFunTradeEvent),       // - 新统一卖出接口
+    PumpFunBuyExactQuoteInV2(PumpFunTradeEvent), // - 新统一 quote 精确买入接口
     PumpFunMigrate(PumpFunMigrateEvent),    // - 已对接
     /// Pump fees：`CreateFeeSharingConfigEvent`（`pfeeUx...`，见 `idls/pump_fees.json`）
     PumpFeesCreateFeeSharingConfig(PumpFeesCreateFeeSharingConfigEvent),
@@ -131,6 +134,9 @@ impl DexEvent {
             DexEvent::PumpFunBuy(e) => &e.metadata,
             DexEvent::PumpFunSell(e) => &e.metadata,
             DexEvent::PumpFunBuyExactSolIn(e) => &e.metadata,
+            DexEvent::PumpFunBuyV2(e) => &e.metadata,
+            DexEvent::PumpFunSellV2(e) => &e.metadata,
+            DexEvent::PumpFunBuyExactQuoteInV2(e) => &e.metadata,
             DexEvent::PumpFunMigrate(e) => &e.metadata,
             DexEvent::PumpFeesCreateFeeSharingConfig(e) => &e.metadata,
             DexEvent::PumpFeesInitializeFeeConfig(e) => &e.metadata,
@@ -235,6 +241,9 @@ impl DexEvent {
             DexEvent::PumpFunBuy(e) => Some(&mut e.metadata),
             DexEvent::PumpFunSell(e) => Some(&mut e.metadata),
             DexEvent::PumpFunBuyExactSolIn(e) => Some(&mut e.metadata),
+            DexEvent::PumpFunBuyV2(e) => Some(&mut e.metadata),
+            DexEvent::PumpFunSellV2(e) => Some(&mut e.metadata),
+            DexEvent::PumpFunBuyExactQuoteInV2(e) => Some(&mut e.metadata),
             DexEvent::PumpFunMigrate(e) => Some(&mut e.metadata),
             DexEvent::PumpFeesCreateFeeSharingConfig(e) => Some(&mut e.metadata),
             DexEvent::PumpFeesInitializeFeeConfig(e) => Some(&mut e.metadata),

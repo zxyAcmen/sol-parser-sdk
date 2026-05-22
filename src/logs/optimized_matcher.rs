@@ -365,6 +365,9 @@ pub fn parse_log_optimized(
                             | EventType::PumpFunBuy
                             | EventType::PumpFunSell
                             | EventType::PumpFunBuyExactSolIn
+                            | EventType::PumpFunBuyV2
+                            | EventType::PumpFunSellV2
+                            | EventType::PumpFunBuyExactQuoteInV2
                             | EventType::PumpFunMigrateBondingCurveCreator
                             | EventType::PumpFeesCreateFeeSharingConfig
                             | EventType::PumpFeesInitializeFeeConfig
@@ -422,6 +425,9 @@ pub fn parse_log_optimized(
                         EventType::PumpFunBuy
                             | EventType::PumpFunSell
                             | EventType::PumpFunBuyExactSolIn
+                            | EventType::PumpFunBuyV2
+                            | EventType::PumpFunSellV2
+                            | EventType::PumpFunBuyExactQuoteInV2
                             | EventType::PumpFunCreate
                             | EventType::PumpFunCreateV2
                     )
@@ -432,6 +438,15 @@ pub fn parse_log_optimized(
                         DexEvent::PumpFunSell(_) => include_only.contains(&EventType::PumpFunSell),
                         DexEvent::PumpFunBuyExactSolIn(_) => {
                             include_only.contains(&EventType::PumpFunBuyExactSolIn)
+                        }
+                        DexEvent::PumpFunBuyV2(_) => {
+                            include_only.contains(&EventType::PumpFunBuyV2)
+                        }
+                        DexEvent::PumpFunSellV2(_) => {
+                            include_only.contains(&EventType::PumpFunSellV2)
+                        }
+                        DexEvent::PumpFunBuyExactQuoteInV2(_) => {
+                            include_only.contains(&EventType::PumpFunBuyExactQuoteInV2)
                         }
                         DexEvent::PumpFunTrade(_) => {
                             include_only.contains(&EventType::PumpFunTrade)

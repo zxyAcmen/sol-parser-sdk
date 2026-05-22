@@ -494,6 +494,9 @@ fn parse_trade_event_optimized(
             "buy" => Some(DexEvent::PumpFunBuy(trade_event)),
             "sell" => Some(DexEvent::PumpFunSell(trade_event)),
             "buy_exact_sol_in" => Some(DexEvent::PumpFunBuyExactSolIn(trade_event)),
+            "buy_v2" => Some(DexEvent::PumpFunBuyV2(trade_event)),
+            "sell_v2" => Some(DexEvent::PumpFunSellV2(trade_event)),
+            "buy_exact_quote_in_v2" => Some(DexEvent::PumpFunBuyExactQuoteInV2(trade_event)),
             _ => Some(DexEvent::PumpFunTrade(trade_event)), // 兼容旧版本或未知类型
         }
     }
@@ -779,6 +782,9 @@ pub fn parse_trade_from_data(
             "buy" => Some(DexEvent::PumpFunBuy(trade_event)),
             "sell" => Some(DexEvent::PumpFunSell(trade_event)),
             "buy_exact_sol_in" => Some(DexEvent::PumpFunBuyExactSolIn(trade_event)),
+            "buy_v2" => Some(DexEvent::PumpFunBuyV2(trade_event)),
+            "sell_v2" => Some(DexEvent::PumpFunSellV2(trade_event)),
+            "buy_exact_quote_in_v2" => Some(DexEvent::PumpFunBuyExactQuoteInV2(trade_event)),
             _ => Some(DexEvent::PumpFunTrade(trade_event)),
         }
     }
@@ -795,7 +801,7 @@ pub fn parse_buy_from_data(
 ) -> Option<DexEvent> {
     let event = parse_trade_from_data(data, metadata, is_created_buy)?;
     match &event {
-        DexEvent::PumpFunBuy(_) => Some(event),
+        DexEvent::PumpFunBuy(_) | DexEvent::PumpFunBuyV2(_) => Some(event),
         _ => None,
     }
 }
@@ -811,7 +817,7 @@ pub fn parse_sell_from_data(
 ) -> Option<DexEvent> {
     let event = parse_trade_from_data(data, metadata, is_created_buy)?;
     match &event {
-        DexEvent::PumpFunSell(_) => Some(event),
+        DexEvent::PumpFunSell(_) | DexEvent::PumpFunSellV2(_) => Some(event),
         _ => None,
     }
 }
@@ -827,7 +833,7 @@ pub fn parse_buy_exact_sol_in_from_data(
 ) -> Option<DexEvent> {
     let event = parse_trade_from_data(data, metadata, is_created_buy)?;
     match &event {
-        DexEvent::PumpFunBuyExactSolIn(_) => Some(event),
+        DexEvent::PumpFunBuyExactSolIn(_) | DexEvent::PumpFunBuyExactQuoteInV2(_) => Some(event),
         _ => None,
     }
 }

@@ -188,6 +188,9 @@ fn parse_trade_event_inner_borsh(
         "buy" => Some(DexEvent::PumpFunBuy(event)),
         "sell" => Some(DexEvent::PumpFunSell(event)),
         "buy_exact_sol_in" => Some(DexEvent::PumpFunBuyExactSolIn(event)),
+        "buy_v2" => Some(DexEvent::PumpFunBuyV2(event)),
+        "sell_v2" => Some(DexEvent::PumpFunSellV2(event)),
+        "buy_exact_quote_in_v2" => Some(DexEvent::PumpFunBuyExactQuoteInV2(event)),
         _ => Some(DexEvent::PumpFunTrade(event)),
     }
 }
@@ -337,6 +340,9 @@ fn parse_trade_event_inner_zero_copy(
             "buy" => Some(DexEvent::PumpFunBuy(trade_event)),
             "sell" => Some(DexEvent::PumpFunSell(trade_event)),
             "buy_exact_sol_in" => Some(DexEvent::PumpFunBuyExactSolIn(trade_event)),
+            "buy_v2" => Some(DexEvent::PumpFunBuyV2(trade_event)),
+            "sell_v2" => Some(DexEvent::PumpFunSellV2(trade_event)),
+            "buy_exact_quote_in_v2" => Some(DexEvent::PumpFunBuyExactQuoteInV2(trade_event)),
             _ => Some(DexEvent::PumpFunTrade(trade_event)),
         }
     }

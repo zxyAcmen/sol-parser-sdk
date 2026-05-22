@@ -241,10 +241,13 @@ pub enum EventType {
     BonkMigrateAmm,
 
     // PumpFun events
-    PumpFunTrade,         // All trade events (backward compatible)
-    PumpFunBuy,           // Buy events only (filter by ix_name)
-    PumpFunSell,          // Sell events only (filter by ix_name)
-    PumpFunBuyExactSolIn, // BuyExactSolIn events only (filter by ix_name)
+    PumpFunTrade,             // All trade events (backward compatible)
+    PumpFunBuy,               // Buy events only (filter by ix_name)
+    PumpFunSell,              // Sell events only (filter by ix_name)
+    PumpFunBuyExactSolIn,     // BuyExactSolIn events only (filter by ix_name)
+    PumpFunBuyV2,             // buy_v2 events only
+    PumpFunSellV2,            // sell_v2 events only
+    PumpFunBuyExactQuoteInV2, // buy_exact_quote_in_v2 events only
     PumpFunCreate,
     PumpFunCreateV2, // SPL-22 / Mayhem create
     PumpFunComplete,
@@ -359,6 +362,9 @@ impl EventTypeFilter {
                         EventType::PumpFunBuy
                             | EventType::PumpFunSell
                             | EventType::PumpFunBuyExactSolIn
+                            | EventType::PumpFunBuyV2
+                            | EventType::PumpFunSellV2
+                            | EventType::PumpFunBuyExactQuoteInV2
                     )
                 });
             }
@@ -382,6 +388,9 @@ impl EventTypeFilter {
                         | EventType::PumpFunBuy
                         | EventType::PumpFunSell
                         | EventType::PumpFunBuyExactSolIn
+                        | EventType::PumpFunBuyV2
+                        | EventType::PumpFunSellV2
+                        | EventType::PumpFunBuyExactQuoteInV2
                         | EventType::PumpFunCreate
                         | EventType::PumpFunCreateV2
                         | EventType::PumpFunComplete
@@ -408,6 +417,9 @@ impl EventTypeFilter {
                         | EventType::PumpFunBuy
                         | EventType::PumpFunSell
                         | EventType::PumpFunBuyExactSolIn
+                        | EventType::PumpFunBuyV2
+                        | EventType::PumpFunSellV2
+                        | EventType::PumpFunBuyExactQuoteInV2
                         | EventType::PumpFunCreate
                         | EventType::PumpFunCreateV2
                         | EventType::PumpFunComplete

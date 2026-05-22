@@ -34,12 +34,21 @@ pub fn merge_events(base: &mut DexEvent, inner: DexEvent) {
         | (PumpFunTrade(b), PumpFunBuy(i))
         | (PumpFunTrade(b), PumpFunSell(i))
         | (PumpFunTrade(b), PumpFunBuyExactSolIn(i))
+        | (PumpFunTrade(b), PumpFunBuyV2(i))
+        | (PumpFunTrade(b), PumpFunSellV2(i))
+        | (PumpFunTrade(b), PumpFunBuyExactQuoteInV2(i))
         | (PumpFunBuy(b), PumpFunTrade(i))
         | (PumpFunBuy(b), PumpFunBuy(i))
         | (PumpFunSell(b), PumpFunTrade(i))
         | (PumpFunSell(b), PumpFunSell(i))
         | (PumpFunBuyExactSolIn(b), PumpFunTrade(i))
-        | (PumpFunBuyExactSolIn(b), PumpFunBuyExactSolIn(i)) => merge_pumpfun_trade(b, i),
+        | (PumpFunBuyExactSolIn(b), PumpFunBuyExactSolIn(i))
+        | (PumpFunBuyV2(b), PumpFunTrade(i))
+        | (PumpFunBuyV2(b), PumpFunBuyV2(i))
+        | (PumpFunSellV2(b), PumpFunTrade(i))
+        | (PumpFunSellV2(b), PumpFunSellV2(i))
+        | (PumpFunBuyExactQuoteInV2(b), PumpFunTrade(i))
+        | (PumpFunBuyExactQuoteInV2(b), PumpFunBuyExactQuoteInV2(i)) => merge_pumpfun_trade(b, i),
 
         (PumpFunCreate(b), PumpFunCreate(i)) => merge_pumpfun_create(b, i),
         (PumpFunCreateV2(b), PumpFunCreateV2(i)) => merge_generic(b, i),
@@ -261,12 +270,21 @@ pub fn can_merge(base: &DexEvent, inner: &DexEvent) -> bool {
         | (DexEvent::PumpFunTrade(_), DexEvent::PumpFunBuy(_))
         | (DexEvent::PumpFunTrade(_), DexEvent::PumpFunSell(_))
         | (DexEvent::PumpFunTrade(_), DexEvent::PumpFunBuyExactSolIn(_))
+        | (DexEvent::PumpFunTrade(_), DexEvent::PumpFunBuyV2(_))
+        | (DexEvent::PumpFunTrade(_), DexEvent::PumpFunSellV2(_))
+        | (DexEvent::PumpFunTrade(_), DexEvent::PumpFunBuyExactQuoteInV2(_))
         | (DexEvent::PumpFunBuy(_), DexEvent::PumpFunTrade(_))
         | (DexEvent::PumpFunBuy(_), DexEvent::PumpFunBuy(_))
         | (DexEvent::PumpFunSell(_), DexEvent::PumpFunTrade(_))
         | (DexEvent::PumpFunSell(_), DexEvent::PumpFunSell(_))
         | (DexEvent::PumpFunBuyExactSolIn(_), DexEvent::PumpFunTrade(_))
-        | (DexEvent::PumpFunBuyExactSolIn(_), DexEvent::PumpFunBuyExactSolIn(_)) => true,
+        | (DexEvent::PumpFunBuyExactSolIn(_), DexEvent::PumpFunBuyExactSolIn(_))
+        | (DexEvent::PumpFunBuyV2(_), DexEvent::PumpFunTrade(_))
+        | (DexEvent::PumpFunBuyV2(_), DexEvent::PumpFunBuyV2(_))
+        | (DexEvent::PumpFunSellV2(_), DexEvent::PumpFunTrade(_))
+        | (DexEvent::PumpFunSellV2(_), DexEvent::PumpFunSellV2(_))
+        | (DexEvent::PumpFunBuyExactQuoteInV2(_), DexEvent::PumpFunTrade(_))
+        | (DexEvent::PumpFunBuyExactQuoteInV2(_), DexEvent::PumpFunBuyExactQuoteInV2(_)) => true,
 
         // PumpFun Create / CreateV2 可以合并
         (DexEvent::PumpFunCreate(_), DexEvent::PumpFunCreate(_)) => true,
@@ -532,6 +550,21 @@ pub fn merge_grpc_instruction_into_log(log: &mut DexEvent, ix: DexEvent) {
                 merge_pumpfun_trade_log_preferred(l, i);
             }
         }
+        PumpFunBuyV2(l) => {
+            if let Some(i) = pumpfun_trade_from_ix_variant(ix) {
+                merge_pumpfun_trade_log_preferred(l, i);
+            }
+        }
+        PumpFunSellV2(l) => {
+            if let Some(i) = pumpfun_trade_from_ix_variant(ix) {
+                merge_pumpfun_trade_log_preferred(l, i);
+            }
+        }
+        PumpFunBuyExactQuoteInV2(l) => {
+            if let Some(i) = pumpfun_trade_from_ix_variant(ix) {
+                merge_pumpfun_trade_log_preferred(l, i);
+            }
+        }
         PumpFunCreate(l) => {
             if let DexEvent::PumpFunCreate(i) = ix {
                 merge_pumpfun_create_log_preferred(l, i);
@@ -617,7 +650,10 @@ fn pumpfun_trade_from_ix_variant(ix: DexEvent) -> Option<PumpFunTradeEvent> {
         DexEvent::PumpFunTrade(t)
         | DexEvent::PumpFunBuy(t)
         | DexEvent::PumpFunSell(t)
-        | DexEvent::PumpFunBuyExactSolIn(t) => Some(t),
+        | DexEvent::PumpFunBuyExactSolIn(t)
+        | DexEvent::PumpFunBuyV2(t)
+        | DexEvent::PumpFunSellV2(t)
+        | DexEvent::PumpFunBuyExactQuoteInV2(t) => Some(t),
         _ => None,
     }
 }
